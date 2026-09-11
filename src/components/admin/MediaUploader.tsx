@@ -1,0 +1,4 @@
+import { useRef } from 'react';
+import { Upload } from 'lucide-react';
+
+export function MediaUploader({ category = 'General', onUpload }: { category?: string; onUpload: (file: { name: string; type: string; src: string; category: string }) => void }) { const input = useRef<HTMLInputElement>(null); const change = (files: FileList | null) => { Array.from(files ?? []).forEach(file => { const reader = new FileReader(); reader.onload = () => onUpload({ name: file.name, type: file.type, src: String(reader.result), category }); reader.readAsDataURL(file); }); }; return <><input ref={input} className="hidden" type="file" accept="image/*" multiple onChange={e => change(e.target.files)} /><button type="button" onClick={() => input.current?.click()} className="flex items-center gap-2 rounded-full bg-[#c8ff4b] px-5 py-3 text-xs font-black uppercase tracking-widest text-[#07100c]"><Upload size={15} /> Upload images</button></>; }

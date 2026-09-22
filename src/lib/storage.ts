@@ -6,10 +6,10 @@ export interface Player { id: string; name: string; number: number; position: st
 export interface Team { id: string; name: string; short: string; captain: string; city: string; group: string; logo: string; players: Player[]; }
 export interface Fixture { id: string; stage: string; group: string; homeId: string; awayId: string; date: string; time: string; pitch: string; status: FixtureStatus; homeScore?: number; awayScore?: number; }
 export interface Post { id: string; title: string; slug: string; category: string; excerpt: string; content: string; image: string; date: string; featured: boolean; status: 'Draft' | 'Published'; updatedAt?: string; }
-export interface TeamRegistration { id: string; teamName: string; captain: string; email: string; city: string; players: string[]; status: ApplicationStatus; submitted: string; logo?: string; officialTeamId?: string; }
-export interface VendorRegistration { id: string; business: string; contact: string; category: string; email: string; status: ApplicationStatus; submitted: string; }
+export interface TeamRegistration { id: string; teamName: string; captain: string; email: string; city: string; players: string[]; status: ApplicationStatus; submitted: string; logo?: string; officialTeamId?: string; reviewNote?: string; paymentStatus?: 'Awaiting payment' | 'Under review' | 'Verified'; }
+export interface VendorRegistration { id: string; business: string; contact: string; category: string; email: string; description?: string; status: ApplicationStatus; submitted: string; reviewNote?: string; paymentStatus?: 'Awaiting payment' | 'Under review' | 'Verified'; }
 export type ModuleKey = 'news' | 'tournament' | 'fixtures' | 'results' | 'standings' | 'knockout' | 'teams' | 'teamRegistration' | 'vendorRegistration' | 'vendors' | 'gallery' | 'sponsors' | 'countdown' | 'liveScores' | 'homepageNews' | 'homepageTeams' | 'homepageSponsors';
-export interface Settings { lifecycle: Lifecycle; tournamentName: string; eventDate: string; venue: string; city: string; prize: number; numberOfTeams: number; affiliationFee: number; spotBookingFee: number; vendorStallFee: number; contactEmail: string; contactPhone: string; whatsapp: string; instagram: string; facebook: string; branding: { mainLogo: string; lightLogo: string; favicon: string }; modules: Record<ModuleKey, boolean>; }
+export interface Settings { lifecycle: Lifecycle; tournamentName: string; eventDate: string; venue: string; city: string; prize: number; numberOfTeams: number; affiliationFee: number; spotBookingFee: number; vendorStallFee: number; contactEmail: string; contactPhone: string; whatsapp: string; instagram: string; facebook: string; twitter: string; youtube: string; tiktok: string; branding: { mainLogo: string; lightLogo: string; favicon: string }; modules: Record<ModuleKey, boolean>; }
 
 const keys = {
   teams: 'best5_teams', fixtures: 'best5_fixtures', posts: 'best5_posts', teamRegs: 'best5_team_registrations', vendorRegs: 'best5_vendor_registrations', settings: 'best5_settings',
@@ -71,10 +71,11 @@ function read<T>(key: string, fallback: T): T {
 }
 function write<T>(key: string, value: T): T {
   localStorage.setItem(key, JSON.stringify(value));
+  window.dispatchEvent(new Event('best5:data'));
   return value;
 }
 
-export const defaultSettings: Settings = { lifecycle: 'Pre Tournament', tournamentName: 'BEST5 Football Exhibition', eventDate: '2026-12-12T09:00:00', venue: 'Northern Muslim School', city: 'Polokwane', prize: 10000, numberOfTeams: 16, affiliationFee: 1500, spotBookingFee: 250, vendorStallFee: 350, contactEmail: 'admin@best5.co.za', contactPhone: '+27 72 000 5505', whatsapp: '+27 72 000 5505', instagram: '@bestfivefootball_exhibition', facebook: '', branding: { mainLogo: '/assets/images/logo/smt_logo.png', lightLogo: '/assets/images/logo/smt_logo.png', favicon: '/assets/images/logo/smt_logo.png' }, modules: { news: true, tournament: true, fixtures: true, results: true, standings: true, knockout: true, teams: true, teamRegistration: true, vendorRegistration: true, vendors: true, gallery: true, sponsors: true, countdown: true, liveScores: true, homepageNews: true, homepageTeams: true, homepageSponsors: true } };
+export const defaultSettings: Settings = { lifecycle: 'Pre Tournament', tournamentName: 'BEST5 Football Exhibition', eventDate: '2026-12-12T09:00:00', venue: 'Northern Muslim School', city: 'Polokwane', prize: 10000, numberOfTeams: 16, affiliationFee: 1500, spotBookingFee: 250, vendorStallFee: 350, contactEmail: 'admin@best5.co.za', contactPhone: '+27 72 000 5505', whatsapp: '+27 72 000 5505', instagram: 'https://instagram.com/bestfivefootball_exhibition', facebook: '', twitter: '', youtube: '', tiktok: '', branding: { mainLogo: '/assets/images/logo/smt_logo.png', lightLogo: '/assets/images/logo/smt_logo.png', favicon: '/assets/images/logo/smt_logo.png' }, modules: { news: true, tournament: true, fixtures: true, results: true, standings: true, knockout: true, teams: true, teamRegistration: true, vendorRegistration: true, vendors: true, gallery: true, sponsors: true, countdown: true, liveScores: true, homepageNews: true, homepageTeams: true, homepageSponsors: true } };
 
 export const repository = {
   seed() {

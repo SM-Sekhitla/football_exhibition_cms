@@ -7,17 +7,35 @@
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body { margin: 0; min-width: 320px; background: #07100c; }
+/* Let nested cards and form fields shrink inside narrow grid/flex layouts. */
+.grid > *, .flex > * { min-width: 0; }
+.field { min-width: 0; max-width: 100%; }
+h1, h2, h3, p, label, b, .post-editor { overflow-wrap: anywhere; }
+svg { flex-shrink: 0; }
+@media (max-width: 639px) {
+  .display.text-6xl { font-size: 2.75rem; }
+  .display.text-5xl { font-size: 2.25rem; }
+  .display.text-4xl { font-size: 1.875rem; }
+  .rounded-3xl.p-8, .rounded-3xl.p-7, .rounded-3xl.p-6 { padding: 1rem; }
+  .py-20 { padding-top: 3rem; padding-bottom: 3rem; }
+  main.pt-36 { padding-top: 7rem; }
+  main > .mb-14 { margin-bottom: 2rem; padding-bottom: 1.5rem; }
+  .field { font-size: 16px; }
+  .editor-tool { min-height: 44px; min-width: 44px; justify-content: center; }
+}
 button, input, select, textarea { font: inherit; }
 button { cursor: pointer; }
 .field { width: 100%; border: 1px solid rgba(255,255,255,.14); border-radius: 12px; background: rgba(255,255,255,.05); color: #f5f7f4; padding: 14px 16px; outline: none; transition: border-color .2s ease, background .2s ease; }
 .field:focus { border-color: rgba(200,255,75,.7); background: rgba(255,255,255,.08); }
 .field::placeholder { color: rgba(255,255,255,.35); }
 .field option { background: #0d1d14; color: #f5f7f4; }
+.field.pl-11 { padding-left: 2.75rem; }
+.field.pr-12 { padding-right: 3rem; }
 .display { font-family: 'Barlow Condensed', sans-serif; letter-spacing: .02em; }
 .grain { position: relative; }
 .grain::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .07; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E"); mix-blend-mode: overlay; }
-.hero-zoom { animation: heroZoom 16s ease-in-out infinite alternate; }
-@keyframes heroZoom { from { transform: scale(1); } to { transform: scale(1.08); } }
+.hero-zoom { object-fit: cover !important; background: #07100c; animation: heroZoom 16s ease-in-out infinite alternate; }
+@keyframes heroZoom { from { transform: scale(1); } to { transform: scale(1.025); } }
 .reveal { animation: reveal .7s both; }
 @keyframes reveal { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
 .ticker-track { animation: ticker 32s linear infinite; width: max-content; }
@@ -39,6 +57,25 @@ button { cursor: pointer; }
 .post-editor figure { margin: 1.25rem 0; }
 .post-editor figure img { width: 100%; max-height: 520px; border-radius: .75rem; object-fit: cover; }
 .post-editor figcaption { margin-top: .4rem; color: rgba(255,255,255,.4); font-size: .75rem; text-align: center; }
+.toast-card { animation: toastIn .28s ease-out both; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(-12px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: #09130f; }
 ::-webkit-scrollbar-thumb { background: #254d34; border-radius: 99px; }
+
+.panel { width: 100%; border: 1px solid #ffffff1a; border-radius: 1.5rem; background: #0d1d14; padding: clamp(1rem, 3vw, 1.75rem); }
+.btn-primary, .btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; padding: .75rem 1.25rem; border-radius: 999px; font-size: .75rem; font-weight: 800; text-align: center; }
+.btn-primary { background: #c8ff4b; color: #07100c; }
+.btn-secondary { border: 1px solid #ffffff40; color: #f5f7f4; }
+button:disabled { cursor: not-allowed; opacity: .45; }
+:focus-visible { outline: 2px solid #c8ff4b; outline-offset: 4px; }
+.app-dialog { border: 0; padding: 1rem; background: transparent; color: #f5f7f4; width: min(100%, 64rem); max-width: 100vw; max-height: 95dvh; overflow-y: auto; }
+.app-dialog::backdrop { background: #000b; backdrop-filter: blur(5px); }
+.app-dialog > .panel { margin-inline: auto; }
+.form-error { border-left: 3px solid #fca5a5; padding: .75rem 1rem; color: #fecaca; background: #ef444410; }
+.skip-link { position: fixed; top: .5rem; left: .5rem; z-index: 100; transform: translateY(-200%); }
+.skip-link:focus { transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

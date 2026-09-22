@@ -1,0 +1,10 @@
+import { useState, type FormEvent } from 'react';
+import { useUnsavedChanges, safeUrl } from '@/lib/ux';
+import { toast } from '@/components/shared/Toast';
+import { Save } from 'lucide-react';
+import { AdminPageHeader, FormField } from '@/components/admin/AdminUi';
+import { settingsService } from '@/services/cmsServices';
+import type { Settings } from '@/lib/storage';
+
+const fields:[keyof Settings,string,string][]=[['instagram','Instagram URL','https://instagram.com/...'],['facebook','Facebook URL','https://facebook.com/...'],['twitter','X / Twitter URL','https://x.com/...'],['youtube','YouTube URL','https://youtube.com/...'],['tiktok','TikTok URL','https://tiktok.com/@...'],['whatsapp','WhatsApp number or link','+27...']];
+export default function AdminSocialLinksPage(){const [settings,setSettings]=useState(settingsService.get());const [baseline,setBaseline]=useState(JSON.stringify(settings));useUnsavedChanges(JSON.stringify(settings)!==baseline);const [saved,setSaved]=useState(false);const submit=(e:FormEvent)=>{e.preventDefault();if(fields.some(([key])=>key!=='whatsapp'&&settings[key]&&!safeUrl(String(settings[key])))){toast.error('Check your links','Enter a valid website address.');return}try{setSettings(settingsService.update(settings));setBaseline(JSON.stringify(settings));}catch{toast.error('Could not save links');return}setSaved(true);setTimeout(()=>setSaved(false),1500)};return <form onSubmit={submit}><AdminPageHeader title="Social links" eyebrow={saved?'Links updated':'Footer & contact'} action={<button className="flex items-center gap-2 rounded-full bg-[#c8ff4b] px-5 py-3 text-xs font-black uppercase text-[#07100c]"><Save size={15}/>Save links</button>}/><div className="max-w-3xl space-y-5 rounded-3xl border border-white/10 bg-white/[.04] p-6">{fields.map(([key,label,placeholder])=><FormField key={key} label={label}><input value={String(settings[key])} onChange={e=>setSettings({...settings,[key]:e.target.value})} placeholder={placeholder} className="field"/></FormField>)}<p className="text-xs leading-5 text-white/40">Leave a social-network field empty to hide its icon from the public footer.</p></div></form>}

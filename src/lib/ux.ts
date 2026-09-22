@@ -15,8 +15,8 @@ export function useUnsavedChanges(dirty: boolean) {
   current.current = dirty;
   useEffect(() => {
     if (!dirty) return;
-    const unload = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ''; };
-    const guard = (e: Event) => { if (current.current && !window.confirm('Discard unsaved changes?')) e.preventDefault(); };
+    const unload = (e: BeforeUnloadEvent) => { if (current.current) { e.preventDefault(); e.returnValue = ''; } };
+    const guard = (e: Event) => { if (current.current) { if (!window.confirm('Discard unsaved changes?')) e.preventDefault(); else current.current = false; } };
     window.addEventListener('beforeunload', unload);
     window.addEventListener('best5:navigate', guard);
     return () => { window.removeEventListener('beforeunload', unload); window.removeEventListener('best5:navigate', guard); };

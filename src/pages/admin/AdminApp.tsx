@@ -14,7 +14,9 @@ import AdminSocialLinksPage from './settings/AdminSocialLinksPage';
 import { ApplicationsPage, FixturesPage } from './OperationsPages';
 import { BrandingPage, GalleryPage, MediaPage, ModulesPage, PostsPage, SettingsPage, TeamsPage } from './ManagementPages';
 
-const nav = [['Dashboard','/admin'],['Landing Page','/admin/landing'],['Posts','/admin/posts'],['Fixtures & Results','/admin/fixtures'],['Media','/admin/media'],['Gallery','/admin/media/gallery'],['Vendors','/admin/vendors'],['Vendor Applications','/admin/vendor-registrations'],['Teams','/admin/teams'],['Team Registrations','/admin/team-registrations'],['Settings','/admin/settings'],['Modules','/admin/settings/modules'],['Social Links','/admin/settings/social'],['Branding','/admin/media/branding']];
+import AdminRegistrationPage from './settings/AdminRegistrationPage';
+
+const nav = [['Dashboard','/admin'],['Landing Page','/admin/landing'],['Posts','/admin/posts'],['Fixtures & Results','/admin/fixtures'],['Media','/admin/media'],['Gallery','/admin/media/gallery'],['Vendors','/admin/vendors'],['Vendor Applications','/admin/vendor-registrations'],['Teams','/admin/teams'],['Team Registrations','/admin/team-registrations'],['Registration & Banking','/admin/settings/registration'],['Settings','/admin/settings'],['Modules','/admin/settings/modules'],['Social Links','/admin/settings/social'],['Branding','/admin/media/branding']];
 export default function AdminApp() {
   useDataRevision();
   const [loggedIn,setLoggedIn] = useState(authService.isAuthenticated);
@@ -43,6 +45,7 @@ function AdminRoutes({ path,navigate }: { path:string; navigate:(path:string)=>v
   if (path === '/admin/team-registrations') return <ApplicationsPage kind="team"/>;
   if (path === '/admin/vendor-registrations') return <ApplicationsPage kind="vendor"/>;
   if (path === '/admin/settings/modules') return <ModulesPage/>;
+  if (path === '/admin/settings/registration') return <AdminRegistrationPage/>;
   if (path === '/admin/settings') return <SettingsPage/>;
   return <><AdminPageHeader title="Page not found"/><button className="btn-primary" onClick={() => navigate('/admin')}>Back to dashboard</button></>;
 }

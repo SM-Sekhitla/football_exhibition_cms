@@ -8,5 +8,6 @@ export const authService = {
     localStorage.setItem(SESSION_KEY, JSON.stringify({ identity, remember, signedInAt: new Date().toISOString() }));
     return true;
   },
+  verifyPassword(password: string) { return this.isAuthenticated() && password === 'Best5Admin2026'; },
   logout() { localStorage.removeItem(SESSION_KEY); },
 };

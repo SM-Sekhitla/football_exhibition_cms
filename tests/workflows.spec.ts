@@ -6,7 +6,7 @@ async function admin(page: Page, path = '/admin') {
   await page.goto(path);
 }
 
-test('public URLs support refresh, back, article reading and group filtering', async ({ page }) => {
+test('public URLs support refresh, back, article reading and an empty team list', async ({ page }) => {
   await page.goto('/news');
   await page.getByRole('button',{ name:'Read story',exact:true }).first().click();
   await expect(page).toHaveURL(/\/news\/road-to-best5$/);
@@ -15,24 +15,22 @@ test('public URLs support refresh, back, article reading and group filtering', a
   await page.goBack();
   await expect(page.getByRole('heading',{ name:'News',exact:true })).toBeVisible();
   await page.goto('/teams');
-  await page.getByRole('button',{ name:'Group B',exact:true }).click();
-  await expect(page.locator('main button.card-lift')).toHaveCount(4);
+  await expect(page.locator('main button.card-lift')).toHaveCount(0);
   await expect(page.locator('main')).not.toContainText('Polokwane City');
-  await page.locator('main button.card-lift').first().click();
-  await expect(page.getByRole('dialog')).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(page.getByRole('dialog')).toHaveCount(0);
-  await expect(page.locator('main button.card-lift').first()).toBeFocused();
 });
 
 test('team registration recovers drafts, validates squad, reviews, approves and tracks status', async ({ page }) => {
   test.setTimeout(60000);
   await page.goto('/register');
+  await page.getByRole('checkbox').check();
+  await page.getByRole('button', { name: 'Start team registration' }).click();
   await page.getByLabel('Team name',{exact:true}).fill('Workflow United');
   await page.getByLabel('Captain name').fill('Test Captain');
   await page.getByLabel('Email address',{exact:true}).fill('captain@example.com');
   await page.getByLabel('City',{exact:true}).fill('Polokwane');
   await page.reload();
+  await page.getByRole('checkbox').check();
+  await page.getByRole('button', { name: 'Start team registration' }).click();
   await expect(page.getByLabel('Team name',{exact:true})).toHaveValue('Workflow United');
   await page.getByRole('button',{name:'Continue',exact:true}).click();
   for (let i=1;i<=5;i++) await page.getByLabel(`Player ${i}`,{exact:true}).fill('Same Player');
@@ -45,6 +43,7 @@ test('team registration recovers drafts, validates squad, reviews, approves and 
   await expect(page.getByLabel('Player 5',{exact:true})).toHaveValue('Player Name 5');
   await page.getByRole('button',{name:'Continue',exact:true}).click();
   await page.getByRole('checkbox').check();
+  await page.getByLabel('Spot booking proof of payment (POP)').setInputFiles({ name: 'proof.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4 payment proof') });
   await page.getByRole('button',{name:'Submit application',exact:true}).click();
   const reference = await page.getByTestId('application-reference').innerText();
   await expect(page.getByRole('link',{name:'Contact organiser',exact:true})).toHaveAttribute('href',/wa\.me.*B5-/);
@@ -93,6 +92,8 @@ test('vendor descriptions reach the review screen', async ({ page }) => {
 
 test('fixture editor rejects invalid teams and publishes results to standings', async ({ page }) => {
   await admin(page,'/admin/fixtures');
+  await page.evaluate(() => localStorage.setItem('best5_teams', JSON.stringify(['T1', 'T3'].map((id,i) => ({ id, name: i ? 'Test Visitors' : 'Polokwane City', short: 'TEST', captain: 'Captain', city: 'Polokwane', group: 'Group A', logo: '', players: [] })))));
+  await page.reload();
   await page.getByRole('button',{name:'Create fixture'}).click();
   await page.getByRole('combobox',{name:'Home team',exact:true}).selectOption('T1');
   await page.getByRole('combobox',{name:'Away team',exact:true}).selectOption('T1');

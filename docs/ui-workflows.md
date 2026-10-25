@@ -5,7 +5,7 @@ The public website and admin workflows use the existing local repository. Data i
 ## Public journeys
 
 - Public pages have URLs with refresh and browser-history support. Articles use `/news/:slug`; unpublished or missing articles show an unavailable state.
-- `/register` has team details, individual squad fields, a review step, and a receipt. It validates 5–8 distinct players, email, required fields and duplicate active applications. Drafts recover on the same device.
+- `/register` first shows admin-editable prerequisites and banking details, requiring acknowledgement before the form. It then has team details, individual squad fields, a review step, and a receipt. It validates 5–8 distinct players, email, required fields and duplicate active applications. Drafts recover on the same device. A PDF, JPG or PNG proof of spot booking payment (up to 2 MB) is required at review; the attachment must be reselected after a reload before submission. Submitted POPs persist with the application, and payment starts under review.
 - `/register/vendor` saves business details, including the description, and returns a reference.
 - `/application-status` looks up an application using its reference and email. It displays approval, payment status and the organiser's note.
 - Receipt links prepare a WhatsApp message to request payment instructions. No payment is collected by the website.
@@ -15,6 +15,8 @@ The public website and admin workflows use the existing local repository. Data i
 
 ## Admin journeys
 
+- `/admin/settings/registration` edits prerequisite text and banking details. Every banking save requires the current demo admin password. This is a client-side check within the existing demo authentication, not server-enforced security.
+- Team application reviews include a POP download.
 - `/admin/fixtures` creates and edits fixtures, scores and match status. Validation checks team selection, groups, whole-number scores and simultaneous team/pitch conflicts. Completed results feed public standings.
 - `/admin/team-registrations` and `/admin/vendor-registrations` provide search, status filters, application details, approval, payment status and notes.
 - Approving a team creates its official-team entry once. Reversing approval removes that entry, unless fixtures still reference it; those fixtures must be resolved first. Removing an official team returns its linked application to pending.
@@ -22,6 +24,10 @@ The public website and admin workflows use the existing local repository. Data i
 - Post drafts, previews and publishing share the same content. Publishing validates title, unique slug, excerpt, content and date. The date is a displayed date, not a scheduled publication time.
 - Image uploads show processing progress and contextual errors. Gallery captions, visibility, featured state and order save immediately; the initial artwork can be managed like other gallery items.
 - Destructive actions use confirmation dialogs. Editors warn before discarding unsaved changes. Dialogs support keyboard focus, Escape and focus restoration.
+
+## Clean registration intake
+
+The `best5_clean_intake_v1` migration clears existing teams, team applications, linked fixtures and team drafts once per browser origin on startup. New browsers start empty; later reloads preserve new registrations. Approving new applications populates the official team list.
 
 ## Backend integration still required
 

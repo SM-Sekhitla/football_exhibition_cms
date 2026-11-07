@@ -1,6 +1,6 @@
 # BEST5 connected workflows
 
-The frontend now uses the FastAPI backend at `../football_exhibition_backend`. Start it with `./src/scripts/start.sh` before `npm run dev`. Vite proxies `/api` to `http://127.0.0.1:8002`; `VITE_API_TARGET` (or legacy `BEST5_BACKEND_URL`) changes that target. Vite loads its `.env` through `loadEnv`; `FRONTEND_PORT`, `VITE_FRONTEND_BASE_URL` and `VITE_ALLOWED_HOSTS` control the dev server. The current frontend `.env` selects port 5174 and the local API at 127.0.0.1:8002. `VITE_API_URL` defaults to `/api/v1`. Keep frontend and API under the same origin in production for cookie and CSRF support.
+The frontend now uses the FastAPI backend at `../../football_exhibition_backend`. From the backend repository root, start it with `./src/scripts/start.sh`; run `npm run dev` from the frontend `src` directory. Vite proxies `/api` to `http://127.0.0.1:8002`; `VITE_API_TARGET` (or legacy `BEST5_BACKEND_URL`) changes that target. Vite loads its `.env` through `loadEnv`; `FRONTEND_PORT`, `VITE_FRONTEND_BASE_URL` and `VITE_ALLOWED_HOSTS` control the dev server. The current frontend `.env` selects port 5174 and the local API at 127.0.0.1:8002. `VITE_API_URL` defaults to `/api/v1`. Keep frontend and API under the same origin in production for cookie and CSRF support.
 
 ## Public journeys
 
@@ -35,7 +35,7 @@ These are not part of this backend integration: captain phone/WhatsApp collectio
 
 ## Verification
 
-Run `npm run typecheck`, `npm run lint`, `npm run build` and `npx playwright test --project=chromium` from the frontend. The browser suite starts an isolated temporary backend on port 8001 and frontend on 5175 and uses no development credentials or live email delivery. Run `.venv/bin/python -m pytest -q` from the backend `src` directory for authentication, security, permissions, files, database, email-provider and workflow tests.
+Run `npm run typecheck`, `npm run lint`, `npm run build` and `npx playwright test --project=chromium` from the frontend `src` directory. The browser suite starts an isolated temporary backend on port 8001 and frontend on 5175 and uses no development credentials or live email delivery. Run `.venv/bin/python -m pytest -q` from the backend `src` directory for authentication, security, permissions, files, database, email-provider and workflow tests.
 
 Upload limits and enabled formats now come from the backend bootstrap response. Backend configuration also accepts the PRISM-style Brevo, storage, cookie/session, admin, logging and host aliases documented in its README. Repeated `.env` assignments use their final value; blank credentials are not restored from earlier assignments.
 

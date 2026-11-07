@@ -8,7 +8,7 @@ function testInvitation(email:string) {
 connection=sqlite3.connect(sys.argv[1])
 row=connection.execute("SELECT body FROM email_jobs WHERE recipient=? AND status='pending' ORDER BY next_attempt DESC LIMIT 1",(sys.argv[2],)).fetchone()
 print(next(line for line in row[0].splitlines() if '/admin/accept-invitation#' in line))`;
-  const link=execFileSync('../football_exhibition_backend/src/.venv/bin/python',['-c',code,process.env.BEST5_E2E_DB_PATH!,email],{encoding:'utf8'}).trim();
+  const link=execFileSync('../../football_exhibition_backend/src/.venv/bin/python',['-c',code,process.env.BEST5_E2E_DB_PATH!,email],{encoding:'utf8'}).trim();
   const url=new URL(link);
   return url.pathname+url.hash;
 }

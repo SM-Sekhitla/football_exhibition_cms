@@ -1,0 +1,10 @@
+name: best5-frontend
+services:
+  frontend:
+    build: .
+    restart: unless-stopped
+    environment:
+      PORT: 8080
+      BACKEND_URL: ${BACKEND_URL:-https://football-exhibition-backend.onrender.com}
+    ports:
+      - "${FRONTEND_PORT:-5174}:8080"

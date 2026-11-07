@@ -36,4 +36,17 @@ See `src/.env.example` and [workflow notes](src/docs/ui-workflows.md) for local 
 
 The frontend project lives in `src/`: React code in `src/src/`, assets in `src/public/`, configuration and dependencies in `src/`, and tests in `src/tests/`. The Dockerfile, Compose file and Docker exclusions stay at the repository root for deployment.
 
-Run npm commands from `src/` (or use `npm --prefix src run build` from the root). For Vercel, select `src` as the project root. Docker builds continue to use the repository root.
+Run npm commands from `src/` (or use `npm --prefix src run build` from the root). For Vercel, keep the repository root (`.`) as the project root; the root `vercel.json` installs and builds the project under `src`. Docker builds continue to use the repository root.
+
+## Vercel deployment
+
+Use Root Directory `.` (the repository root) and framework preset Vite. The root `vercel.json` configures:
+
+- Install: `npm --prefix src ci --include=dev`
+- Build: `npm --prefix src run typecheck && npm --prefix src run build`
+- Output: `src/dist`
+- `/api/*` proxy to the Render backend, before the React route fallback.
+
+Set `VITE_API_URL=/api/v1` in Vercel. Keep backend secrets in Render. Vercel does not use the Docker Nginx configuration or `BACKEND_URL`; update the external rewrite in `vercel.json` if the backend domain changes.
+
+In Render, set `FRONTEND_URL` and `CORS_ORIGINS` to the final Vercel/custom frontend HTTPS origin, and `SECURE_COOKIES=true`. This also makes invitation/reset emails point to the deployed frontend. Redeploy both services after changing their environment settings. Requests to the frontend `/api/v1/health` should return backend JSON, and `/admin/login` should open the React login page.

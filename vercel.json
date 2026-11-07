@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "installCommand": "npm --prefix src ci --include=dev",
+  "buildCommand": "npm --prefix src run typecheck && npm --prefix src run build",
+  "outputDirectory": "src/dist",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://football-exhibition-backend.onrender.com/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

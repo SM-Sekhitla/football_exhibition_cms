@@ -11,7 +11,7 @@ export default function ConnectedApp() {
   const [revealed, setRevealed] = useState(false);
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const timer = window.setTimeout(() => setIntroDone(true), reduced ? 0 : 1600);
+    const timer = window.setTimeout(() => setIntroDone(true), reduced ? 0 : 3400);
     return () => window.clearTimeout(timer);
   }, []);
   useEffect(() => {

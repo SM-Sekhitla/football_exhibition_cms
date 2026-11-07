@@ -1,13 +1,14 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App.tsx';
 import './index.css';
 import { ToastViewport } from './components/shared/Toast.tsx';
 import { ConfirmViewport } from './components/shared/Confirm.tsx';
 
+import ConnectedApp from './ConnectedApp';
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <ConnectedApp />
     <ToastViewport />
     <ConfirmViewport />
   </StrictMode>

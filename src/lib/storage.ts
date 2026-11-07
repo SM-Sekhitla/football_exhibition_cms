@@ -1,3 +1,4 @@
+import { readCache, saveResource } from './api';
 export type Lifecycle = 'Pre Tournament' | 'Matchday' | 'Completed';
 export type FixtureStatus = 'Upcoming' | 'Live' | 'Half Time' | 'Full Time' | 'Cancelled';
 export type ApplicationStatus = 'Pending' | 'Approved' | 'Rejected';
@@ -12,10 +13,6 @@ export type ModuleKey = 'news' | 'tournament' | 'fixtures' | 'results' | 'standi
 export interface BankingDetails { bankName: string; accountNumber: string; accountName: string; accountType: string; branchCode: string; reference: string; }
 export interface Settings { banking: BankingDetails; registrationPrerequisites: string; lifecycle: Lifecycle; tournamentName: string; eventDate: string; venue: string; city: string; prize: number; numberOfTeams: number; affiliationFee: number; spotBookingFee: number; vendorStallFee: number; contactEmail: string; contactPhone: string; whatsapp: string; instagram: string; facebook: string; twitter: string; youtube: string; tiktok: string; branding: { mainLogo: string; lightLogo: string; favicon: string }; modules: Record<ModuleKey, boolean>; }
 
-const keys = {
-  teams: 'best5_teams', fixtures: 'best5_fixtures', posts: 'best5_posts', teamRegs: 'best5_team_registrations', vendorRegs: 'best5_vendor_registrations', settings: 'best5_settings',
-} as const;
-
 const teams: Team[] = [];
 const fixtures: Fixture[] = [];
 const posts: Post[] = [
@@ -23,20 +20,6 @@ const posts: Post[] = [
   { id: 'P2', title: 'Affiliations are open', slug: 'affiliations-open', category: 'Announcements', excerpt: 'Secure your spot, build your squad and get ready to play for the R10,000 winner-takes-all prize.', content: 'Team affiliations are now open. Bring your best five and make your mark.', image: '/assets/images/background-posters/WhatsApp_Image_2026-09-10_at_5.10.05_PM.jpeg', date: '13 Aug 2026', featured: false, status: 'Published' },
   { id: 'P3', title: 'Meet the BEST5 mascot', slug: 'meet-the-mascot', category: 'Culture', excerpt: 'Meet the character bringing energy, style and a little mischief to matchday.', content: 'The BEST5 mascot is ready for the whistle. Find him pitch-side on 12 December.', image: '/assets/images/background-posters/WhatsApp_Image_2026-09-10_at_5.08.28_PM_(2).jpeg', date: '08 Aug 2026', featured: false, status: 'Published' },
 ];
-
-function read<T>(key: string, fallback: T): T {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) as T : fallback;
-  } catch {
-    return fallback;
-  }
-}
-function write<T>(key: string, value: T): T {
-  localStorage.setItem(key, JSON.stringify(value));
-  window.dispatchEvent(new Event('best5:data'));
-  return value;
-}
 
 export const defaultSettings: Settings = { banking: { bankName: 'Standard Bank', accountNumber: '10252684352', accountName: 'SMT ORGANISATION', accountType: 'Current Account', branchCode: '000205', reference: 'Use your team name and “SpotBook” as the reference (e.g. TeamName SpotBook).' }, registrationPrerequisites: `BEST FIVE 2026 TEAM REGISTRATION
 
@@ -65,30 +48,14 @@ QUESTIONS?
 Contact Thato Modiba at 071 413 6394 or BEST5EXHIBITION@GMAIL.COM.`, lifecycle: 'Pre Tournament', tournamentName: 'BEST5 Football Exhibition', eventDate: '2026-12-12T09:00:00', venue: 'Northern Muslim School', city: 'Polokwane', prize: 10000, numberOfTeams: 16, affiliationFee: 1500, spotBookingFee: 250, vendorStallFee: 350, contactEmail: 'admin@best5.co.za', contactPhone: '+27 72 000 5505', whatsapp: '+27 72 000 5505', instagram: 'https://instagram.com/bestfivefootball_exhibition', facebook: '', twitter: '', youtube: '', tiktok: '', branding: { mainLogo: '/assets/images/logo/smt_logo.png', lightLogo: '/assets/images/logo/smt_logo.png', favicon: '/assets/images/logo/smt_logo.png' }, modules: { news: true, tournament: true, fixtures: true, results: true, standings: true, knockout: true, teams: true, teamRegistration: true, vendorRegistration: true, vendors: true, gallery: true, sponsors: true, countdown: true, liveScores: true, homepageNews: true, homepageTeams: true, homepageSponsors: true } };
 
 export const repository = {
-  seed() {
-    // One-time clean start for the new registration intake; never clear later submissions.
-    if (!localStorage.getItem('best5_clean_intake_v1')) {
-      write(keys.teams, []); write(keys.teamRegs, []); write(keys.fixtures, []);
-      localStorage.removeItem('best5_draft_team');
-      localStorage.setItem('best5_clean_intake_v1', 'done');
-    }
-    if (!localStorage.getItem(keys.teams)) write(keys.teams, teams);
-    if (!localStorage.getItem(keys.fixtures)) write(keys.fixtures, fixtures);
-    if (!localStorage.getItem(keys.posts)) write(keys.posts, posts);
-    if (!localStorage.getItem(keys.teamRegs)) write(keys.teamRegs, []);
-    if (!localStorage.getItem(keys.vendorRegs)) write(keys.vendorRegs, []);
-    if (!localStorage.getItem(keys.settings)) write(keys.settings, defaultSettings);
-  },
-  getTeams: () => read<Team[]>(keys.teams, teams),
-  getFixtures: () => read<Fixture[]>(keys.fixtures, fixtures),
-  getPosts: () => read<Post[]>(keys.posts, posts),
-  getTeamRegistrations: () => read<TeamRegistration[]>(keys.teamRegs, []),
-  getVendorRegistrations: () => read<VendorRegistration[]>(keys.vendorRegs, []),
-  getSettings: () => { const saved = read<Partial<Settings>>(keys.settings, defaultSettings); return { ...defaultSettings, ...saved, banking: { ...defaultSettings.banking, ...saved.banking }, branding: { ...defaultSettings.branding, ...saved.branding }, modules: { ...defaultSettings.modules, ...saved.modules } }; },
-  saveTeams: (value: Team[]) => write(keys.teams, value),
-  saveFixtures: (value: Fixture[]) => write(keys.fixtures, value),
-  savePosts: (value: Post[]) => write(keys.posts, value),
-  saveTeamRegistrations: (value: TeamRegistration[]) => write(keys.teamRegs, value),
-  saveVendorRegistrations: (value: VendorRegistration[]) => write(keys.vendorRegs, value),
-  saveSettings: (value: Settings) => write(keys.settings, value),
+  getTeams: () => readCache<Team[]>('teams', teams),
+  getFixtures: () => readCache<Fixture[]>('fixtures', fixtures),
+  getPosts: () => readCache<Post[]>('posts', posts),
+  getTeamRegistrations: () => readCache<TeamRegistration[]>('teamRegs', []),
+  getVendorRegistrations: () => readCache<VendorRegistration[]>('vendorRegs', []),
+  getSettings: () => readCache<Settings>('settings', defaultSettings),
+  saveTeams: (value: Team[]) => saveResource('teams', value),
+  saveFixtures: (value: Fixture[]) => saveResource('fixtures', value),
+  savePosts: (value: Post[]) => saveResource('posts', value),
+  saveSettings: (value: Settings) => saveResource('settings', value),
 };

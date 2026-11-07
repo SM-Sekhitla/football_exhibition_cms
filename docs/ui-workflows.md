@@ -1,40 +1,46 @@
-# UI workflows before backend integration
+# BEST5 connected workflows
 
-The public website and admin workflows use the existing local repository. Data is shared between pages and tabs on the same browser origin, not between devices. Authentication remains the existing demo login.
+The frontend now uses the FastAPI backend at `../football_exhibition_backend`. Start it with `./src/scripts/start.sh` before `npm run dev`. Vite proxies `/api` to `http://127.0.0.1:8002`; `VITE_API_TARGET` (or legacy `BEST5_BACKEND_URL`) changes that target. Vite loads its `.env` through `loadEnv`; `FRONTEND_PORT`, `VITE_FRONTEND_BASE_URL` and `VITE_ALLOWED_HOSTS` control the dev server. The current frontend `.env` selects port 5174 and the local API at 127.0.0.1:8002. `VITE_API_URL` defaults to `/api/v1`. Keep frontend and API under the same origin in production for cookie and CSRF support.
 
 ## Public journeys
 
-- Public pages have URLs with refresh and browser-history support. Articles use `/news/:slug`; unpublished or missing articles show an unavailable state.
-- `/register` first shows admin-editable prerequisites and banking details, requiring acknowledgement before the form. It then has team details, individual squad fields, a review step, and a receipt. It validates 5–8 distinct players, email, required fields and duplicate active applications. Drafts recover on the same device. A PDF, JPG or PNG proof of spot booking payment (up to 2 MB) is required at review; the attachment must be reselected after a reload before submission. Submitted POPs persist with the application, and payment starts under review.
-- `/register/vendor` saves business details, including the description, and returns a reference.
-- `/application-status` looks up an application using its reference and email. It displays approval, payment status and the organiser's note.
-- Receipt links prepare a WhatsApp message to request payment instructions. No payment is collected by the website.
-- Contact forms prepare a message for the user's email app. The website does not claim to have sent it.
-- Tournament standings use completed group-stage matches, with 3 points for a win and 1 for a draw. Ranking uses points, goal difference, goals scored, then name for stable display. Knockout sections display only recorded matchups.
-- Public modules, event information and fees read saved settings. Homepage emphasis follows the selected tournament mode.
+- Public pages, article URLs and browser history work after refresh. Public bootstrap returns published posts, visible vendors/gallery entries, official teams, fixtures, banking, prerequisites, settings and landing-page content.
+- `/register` presents prerequisites and banking details before acknowledgement, followed by team details, 5–8 distinct squad names, review and a required PDF/JPG/PNG POP within the server-configured size/type policy. The server assigns references and review/payment status. Only the unfinished text draft remains on the current device; a file must be reselected after a reload before submission.
+- `/register/vendor` saves business/contact details and returns a server-generated reference.
+- `/application-status` looks up a server record with its reference and email from any device. It returns approval, payment status and organiser notes without exposing private payment documents.
+- Public data refreshes every 30 seconds while visible and on returning to the tab for signed-out visitors. Admin snapshots refresh on page loads and successful mutations, preserving the version an editor started with. Registrations and settings are shared between devices.
+- Contact forms still prepare a message for an email app; they do not send contact enquiries through the backend.
 
 ## Admin journeys
 
-- `/admin/settings/registration` edits prerequisite text and banking details. Every banking save requires the current demo admin password. This is a client-side check within the existing demo authentication, not server-enforced security.
-- Team application reviews include a POP download.
-- `/admin/fixtures` creates and edits fixtures, scores and match status. Validation checks team selection, groups, whole-number scores and simultaneous team/pitch conflicts. Completed results feed public standings.
-- `/admin/team-registrations` and `/admin/vendor-registrations` provide search, status filters, application details, approval, payment status and notes.
-- Approving a team creates its official-team entry once. Reversing approval removes that entry, unless fixtures still reference it; those fixtures must be resolved first. Removing an official team returns its linked application to pending.
-- Vendor application approval and public vendor profiles are separate. Use `/admin/vendors` to publish the vendor's public presentation.
-- Post drafts, previews and publishing share the same content. Publishing validates title, unique slug, excerpt, content and date. The date is a displayed date, not a scheduled publication time.
-- Image uploads show processing progress and contextual errors. Gallery captions, visibility, featured state and order save immediately; the initial artwork can be managed like other gallery items.
-- Destructive actions use confirmation dialogs. Editors warn before discarding unsaved changes. Dialogs support keyboard focus, Escape and focus restoration.
+- Real HttpOnly cookie sessions replace the demo local-storage login. New staff must change temporary passwords before using administration. `/admin/settings/account` changes passwords; forgot/reset password pages use the backend's single-use reset-token flow.
+- `/admin/settings/users` manages staff accounts, roles and deactivation for super admins only. API permissions independently enforce all role restrictions.
+- `/admin/settings/registration` edits prerequisites and banking. Every banking save verifies the current password on the server; ordinary settings requests cannot change banking.
+- `/admin/team-registrations` and `/admin/vendor-registrations` review server-side applications. Team reviews provide an authorised private POP download. Team approval requires verified payment, respects capacity and creates the official team in one transaction.
+- Reversing approval removes the official team unless fixtures reference it. Removing an official team returns the linked application to pending.
+- `/admin/fixtures` validates teams, groups, scores and scheduling conflicts; completed games feed the frontend standings calculation.
+- CMS settings, landing content, articles, media, gallery, vendors and branding persist through the API. Gallery captions save on leaving the field; visibility and ordering save immediately.
+- Content updates use resource revisions. Concurrent stale edits return an error and require a page reload instead of silently overwriting newer data.
+- `/admin/logs` is restricted to super admins and displays filtered audit history, backend request logs and Brevo email queue/retry status.
 
-## Clean registration intake
+## Email and setup
 
-The `best5_clean_intake_v1` migration clears existing teams, team applications, linked fixtures and team drafts once per browser origin on startup. New browsers start empty; later reloads preserve new registrations. Approving new applications populates the official team list.
+Registration receipts, review updates and password-reset emails are queued transactionally. Set `BREVO_API_KEY`, a verified `EMAIL_SENDER` and `EMAIL_ENABLED=true` in the backend `.env`, then restart to enable delivery. Disabled email remains visibly pending; no demo success message claims it was sent. See the backend README for credentials, database configuration, migrations, deployment and backups.
 
-## Backend integration still required
+Backend teams and registrations start empty. Startup preserves subsequent data. The previous browser-only cleanup migration has been removed; preview browser content is not imported into the backend automatically.
 
-Replace local storage and demo authentication with authenticated APIs. Application lookups, payment verification, approvals and publishing currently reflect local demo state. Add server validation, durable storage, authorisation, real submission delivery and any required payment/notification integrations. Do not treat a local receipt or local payment status as proof of a real booking or payment.
+## Remaining product features
+
+These are not part of this backend integration: captain phone/WhatsApp collection, selecting a captain from the squad, team-logo submission, instalment balances/additional POPs, applicant self-service corrections, automated bracket generation, email delivery/bounce webhooks, and real email submission of contact enquiries. Prerequisites remain free text, so organisers must keep their fee/deadline wording consistent with fee settings.
 
 ## Verification
 
-`npm run typecheck`, `npm run lint`, and `npm run build` validate the application.
+Run `npm run typecheck`, `npm run lint`, `npm run build` and `npx playwright test --project=chromium` from the frontend. The browser suite starts an isolated temporary backend on port 8001 and frontend on 5175 and uses no development credentials or live email delivery. Run `.venv/bin/python -m pytest -q` from the backend `src` directory for authentication, security, permissions, files, database, email-provider and workflow tests.
 
-`npx playwright test --project=chromium --workers=2` runs the public, admin and mobile workflow regressions. The Playwright configuration starts the local Vite server if needed. Tests use isolated browser contexts and do not submit real messages or payments.
+Upload limits and enabled formats now come from the backend bootstrap response. Backend configuration also accepts the PRISM-style Brevo, storage, cookie/session, admin, logging and host aliases documented in its README. Repeated `.env` assignments use their final value; blank credentials are not restored from earlier assignments.
+
+The initial bootstrap user is a super admin; ordinary admins retain content, tournament operations, settings and banking access. Only super admins manage staff and backend/email logs. Every login receives server-assigned permissions; a client cannot select its own role. The forced password setup card is centered and all password fields have show/hide controls.
+
+## Staff invitation flow
+
+Staff creation now queues a 48-hour password-setup email instead of asking the super admin to choose a password. The recipient chooses and confirms their password at `/admin/accept-invitation`, then logs in using their invited email address. Existing pending accounts have Send setup email / Resend invitation actions under Settings → Staff & Roles. Resend invalidates older setup links. The page displays email-disabled warnings and per-account queue/setup status; backend logs retain delivery errors. Email must be enabled and the backend restarted after `.env` changes.

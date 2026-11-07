@@ -27,10 +27,10 @@ export default function AdminPostEditorPage({ id,navigate }: { id?:string; navig
     else { const figure = document.createElement('figure'); const image = document.createElement('img'); image.src = src; image.alt = ''; figure.appendChild(image); const caption = document.createElement('figcaption'); caption.textContent = 'Image caption'; figure.appendChild(caption); pendingCommand.current={cmd:'insertHTML',value:figure.outerHTML + '<p><br></p>'}; }
     setPicker(null);
   };
-  const save = (e:FormEvent,status:Post['status']) => {
+  const save = async (e:FormEvent,status:Post['status']) => {
     e.preventDefault(); setError('');
     if (status === 'Published' && !form.current?.reportValidity()) return;
-    try { const value = { ...post,content:articleHtml(editor.current?.innerHTML || ''),status }; postService.save(value); clearDirty(); navigate('/admin/posts'); }
+    try { const value = { ...post,content:articleHtml(editor.current?.innerHTML || ''),status }; await postService.save(value); clearDirty(); navigate('/admin/posts'); }
     catch(err) { setError(err instanceof Error ? err.message : 'Could not save. Your changes are still here.'); }
   };
   const tools = [['Undo','undo',undefined,Undo2],['Redo','redo',undefined,Redo2],['Bold','bold',undefined,Bold],['Italic','italic',undefined,Italic],['Underline','underline',undefined,Underline],['Heading','formatBlock','h2',Heading2],['Bullets','insertUnorderedList',undefined,List],['Numbers','insertOrderedList',undefined,ListOrdered],['Quote','formatBlock','blockquote',Quote]] as const;

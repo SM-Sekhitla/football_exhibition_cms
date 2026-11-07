@@ -1,3 +1,4 @@
+import { readCache, saveResource } from '@/lib/api';
 import { toast } from '@/components/shared/Toast';
 
 export interface LandingPageContent {
@@ -19,7 +20,7 @@ export interface LandingPageContent {
   ctaButton: string;
 }
 
-const KEY = 'best5_landing_page';
+const KEY = 'landing';
 export const defaultLandingPage: LandingPageContent = {
   heroEyebrow: 'SM Organisation presents',
   heroLineOne: 'Best5',
@@ -35,7 +36,7 @@ export const defaultLandingPage: LandingPageContent = {
 };
 
 export const landingPageService = {
-  get(): LandingPageContent { try { const saved=localStorage.getItem(KEY); return saved ? { ...defaultLandingPage, ...JSON.parse(saved) } : defaultLandingPage; } catch { return defaultLandingPage; } },
-  save(value: LandingPageContent) { localStorage.setItem(KEY,JSON.stringify(value)); window.dispatchEvent(new Event('best5:landing')); toast.success('Landing page updated'); return value; },
-  reset() { localStorage.removeItem(KEY); window.dispatchEvent(new Event('best5:landing')); toast.info('Landing page reset'); return defaultLandingPage; },
+  get: () => readCache<LandingPageContent>(KEY, defaultLandingPage),
+  async save(value: LandingPageContent) { await saveResource(KEY,value); toast.success('Landing page updated'); return value; },
+  async reset() { await saveResource(KEY,defaultLandingPage); toast.info('Landing page reset'); return defaultLandingPage; },
 };

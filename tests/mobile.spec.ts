@@ -1,3 +1,4 @@
+import { signIn } from './helpers';
 import { test, expect, type Page } from '@playwright/test';
 
 async function fits(page: Page) {
@@ -19,11 +20,7 @@ for (const width of [320, 390, 768]) {
           await fits(page);
         }
       }
-      if (name === 'Teams') {
-        await page.locator('main button.card-lift').first().click();
-        await fits(page);
-        await page.getByRole('button', { name: 'Close team details' }).click();
-      }
+
     }
     await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
     await page.locator('header').getByRole('button', { name: 'Register Your Team' }).click();
@@ -35,8 +32,8 @@ for (const width of [320, 390, 768]) {
     await page.setViewportSize({ width, height: 667 });
     await page.goto('/admin/login');
     await fits(page);
-    await page.evaluate(() => localStorage.setItem('best5_admin_session', 'layout-test'));
-    for (const path of ['', '/landing', '/posts', '/posts/new', '/media', '/media/gallery', '/vendors', '/teams', '/team-registrations', '/settings', '/settings/modules', '/settings/social', '/media/branding', '/fixtures', '/vendor-registrations']) {
+    await signIn(page);
+    for (const path of ['', '/landing', '/posts', '/posts/new', '/media', '/media/gallery', '/vendors', '/teams', '/team-registrations', '/settings', '/settings/modules', '/settings/social', '/media/branding', '/fixtures', '/vendor-registrations', '/account', '/users', '/logs', '/settings/registration']) {
       await page.goto(`/admin${path}`);
       await fits(page);
       if (path === '/posts/new') {

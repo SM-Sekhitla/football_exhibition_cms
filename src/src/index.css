@@ -122,3 +122,13 @@ nav button:hover { color: #c8ff4b; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Decode before switching; fade the incoming image over a fully visible previous frame. */
+.hero-images { position: absolute; inset: 0; overflow: hidden; opacity: .5; pointer-events: none; }
+.hero-images img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero-images__previous { z-index: 0; }
+.hero-images__current { z-index: 1; animation: hero-crossfade 1.1s ease-in-out both; }
+@keyframes hero-crossfade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .hero-images__current { animation: none; }
+}

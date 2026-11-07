@@ -1,11 +1,24 @@
 import { useEffect, useState } from 'react';
 import App from './App';
+import OpeningLoader from './components/shared/OpeningLoader';
 import { hasPendingSaves, loadSnapshot } from './lib/api';
 import { authService } from './services/authService';
 
 export default function ConnectedApp() {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState('');
+  const [introDone, setIntroDone] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+  useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const timer = window.setTimeout(() => setIntroDone(true), reduced ? 0 : 1600);
+    return () => window.clearTimeout(timer);
+  }, []);
+  useEffect(() => {
+    if (!ready || !introDone) return;
+    const timer = window.setTimeout(() => setRevealed(true), 300);
+    return () => window.clearTimeout(timer);
+  }, [ready, introDone]);
   const connect = async () => {
     setError('');
     try { await authService.initialise(); setReady(true); }
@@ -22,7 +35,6 @@ export default function ConnectedApp() {
     document.addEventListener('visibilitychange',refresh);
     return () => { clearInterval(timer); document.removeEventListener('visibilitychange',refresh); };
   }, [ready]);
-  if (!ready) return <main className="flex min-h-screen items-center justify-center bg-[#07100c] p-6 text-white"><div className="max-w-md space-y-5"><h1 className="display text-3xl">BEST5</h1><p role="status">{error || 'Connecting…'}</p>{error && <button className="btn-primary" onClick={() => void connect()}>Try again</button>}</div></main>;
-  return <App/>;
+  if (!revealed) return <OpeningLoader error={error} leaving={ready && introDone} onRetry={() => void connect()}/>;
+  return <div className="site-arrival"><App/></div>;
 }
-

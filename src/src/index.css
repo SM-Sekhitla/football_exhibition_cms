@@ -79,3 +79,43 @@ button:disabled { cursor: not-allowed; opacity: .45; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Matchday opening sequence: mascot winds up, then sends the ball across the pitch. */
+.opening-loader { position: fixed; inset: 0; z-index: 110; display: grid; place-items: center; overflow: auto; background: #07100c; padding: 24px; isolation: isolate; transition: opacity .3s ease, visibility .3s; }
+.opening-loader--leaving { opacity: 0; visibility: hidden; }
+.opening-loader__glow { position: absolute; width: min(90vw, 620px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #225b303d, transparent 68%); pointer-events: none; }
+.opening-loader__content { position: relative; width: min(100%, 440px); text-align: center; }
+.opening-loader__eyebrow { color: #a5b7aa; font-size: 10px; font-weight: 700; letter-spacing: .25em; }
+.opening-loader__pitch { position: relative; width: 280px; height: 245px; margin: 26px auto 0; }
+.opening-loader__ring { position: absolute; width: 220px; height: 220px; left: 30px; top: 0; border: 1px solid #c8ff4b26; border-radius: 50%; box-shadow: 0 0 0 18px #c8ff4b04, 0 0 0 38px #c8ff4b03; }
+.opening-loader__logo { position: absolute; width: 174px; height: 182px; object-fit: contain; left: 42px; top: 14px; mix-blend-mode: screen; transform-origin: 50% 85%; animation: mascot-kick 1.8s ease-in-out infinite; }
+.opening-loader__ball-path { position: absolute; left: 169px; top: 156px; width: 38px; height: 38px; animation: kicked-ball 1.8s ease-in-out infinite; }
+.opening-loader__ball { width: 100%; height: 100%; filter: drop-shadow(0 5px 8px #0006); animation: ball-spin 1.8s ease-in-out infinite; }
+.opening-loader__trail { position: absolute; width: 56px; height: 2px; left: 179px; top: 178px; background: linear-gradient(90deg, transparent, #c8ff4b); animation: kick-trail 1.8s ease infinite; }
+.opening-loader__ground { position: absolute; left: 25px; right: 25px; bottom: 37px; height: 1px; background: linear-gradient(90deg, transparent, #c8ff4b66, transparent); }
+.opening-loader__title { margin: 0; font-size: clamp(44px, 10vw, 64px); font-weight: 900; line-height: 1; letter-spacing: .04em; }
+.opening-loader__title span { color: #c8ff4b; }
+.opening-loader__status { margin: 18px auto 0; max-width: 360px; color: #a5b7aa; font-size: 14px; line-height: 1.7; }
+.opening-loader__progress { width: 120px; height: 3px; margin: 24px auto 0; background: #ffffff12; border-radius: 10px; overflow: hidden; }
+.opening-loader__progress span { display: block; width: 50%; height: 100%; border-radius: inherit; background: #c8ff4b; animation: loading-pass 1.5s ease-in-out infinite; }
+@keyframes mascot-kick { 0%, 15%, 100% { transform: translateY(0) rotate(0); } 32% { transform: translate(-5px, -3px) rotate(-9deg); } 45% { transform: translate(8px, -7px) rotate(8deg); } 62% { transform: translateY(-2px) rotate(-2deg); } }
+@keyframes kicked-ball { 0%, 33%, 100% { transform: translate(0,0); opacity: 1; } 48% { transform: translate(38px,-45px); opacity: 1; } 70% { transform: translate(88px,-20px); opacity: 1; } 83% { transform: translate(112px,0); opacity: 0; } 84% { transform: translate(0,0); opacity: 0; } }
+@keyframes ball-spin { 0%, 33% { transform: rotate(0); } 83%, 100% { transform: rotate(400deg); } }
+@keyframes kick-trail { 0%, 36%, 70%, 100% { opacity: 0; transform: scaleX(.4); } 48% { opacity: .8; transform: translate(18px,-18px) rotate(-25deg) scaleX(1); } }
+@keyframes loading-pass { from { transform: translateX(-110%); } to { transform: translateX(310%); } }
+.site-arrival, .page-transition { animation: page-arrive .45s ease-out both; }
+@keyframes page-arrive { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.btn-primary, .btn-secondary { transition: transform .2s ease, background-color .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 24px #c8ff4b20; }
+.btn-secondary:hover:not(:disabled) { transform: translateY(-2px); border-color: #c8ff4b88; background: #c8ff4b0a; }
+.btn-primary:active:not(:disabled), .btn-secondary:active:not(:disabled) { transform: translateY(0) scale(.98); }
+nav button { transition: color .2s ease, background-color .2s ease; }
+nav button:hover { color: #c8ff4b; }
+.app-dialog[open] { animation: page-arrive .25s ease-out both; }
+@media (hover: hover) {
+  .page-transition article { transition: transform .25s ease, border-color .25s ease; }
+  .page-transition article:hover { transform: translateY(-3px); border-color: #c8ff4b55; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

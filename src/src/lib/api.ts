@@ -1,5 +1,20 @@
 export const API_URL = (import.meta.env.VITE_API_URL || '/api/v1').replace(/\/$/, '');
 export interface Snapshot { data: Record<string, unknown>; revisions: Record<string, number>; }
+// File links returned by the API remain usable when the frontend has its own host.
+const filePrefix = `${new URL(API_URL, window.location.origin).pathname}/files/`;
+const apiOrigin = new URL(API_URL, window.location.origin).origin;
+function resolveApiFiles(value: unknown): unknown {
+  if (apiOrigin === window.location.origin) return value;
+  if (typeof value === 'string') {
+    if (value.startsWith(filePrefix)) return apiOrigin + value;
+    // Existing rich-text stories can contain relative uploaded-image URLs.
+    return value.split(`src="${filePrefix}`).join(`src="${apiOrigin}${filePrefix}`)
+      .split(`src='${filePrefix}`).join(`src='${apiOrigin}${filePrefix}`);
+  }
+  if (Array.isArray(value)) return value.map(resolveApiFiles);
+  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key,item]) => [key,resolveApiFiles(item)]));
+  return value;
+}
 const cache: Record<string, unknown> = {};
 let revisions: Record<string, number> = {};
 let queue: Promise<unknown> = Promise.resolve();
@@ -16,7 +31,7 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
     if (response.status === 401 && !path.startsWith('/auth/')) window.dispatchEvent(new Event('best5:session-expired'));
     throw new ApiError(response.status, typeof body.detail === 'string' ? body.detail : 'The request failed. Please try again.');
   }
-  return response.json() as Promise<T>;
+  return resolveApiFiles(await response.json()) as T;
 }
 export function readCache<T>(key: string, fallback: T): T { return (cache[key] ?? fallback) as T; }
 export function applySnapshot(snapshot: Snapshot) {

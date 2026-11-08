@@ -44,3 +44,5 @@ The initial bootstrap user is a super admin; ordinary admins retain content, tou
 ## Staff invitation flow
 
 Staff creation now queues a 48-hour password-setup email instead of asking the super admin to choose a password. The recipient chooses and confirms their password at `/admin/accept-invitation`, then logs in using their invited email address. Existing pending accounts have Send setup email / Resend invitation actions under Settings → Staff & Roles. Resend invalidates older setup links. The page displays email-disabled warnings and per-account queue/setup status; backend logs retain delivery errors. Email must be enabled and the backend restarted after `.env` changes.
+
+Team registration accepts an optional team-logo image on the Team details step, with preview and removal. The API verifies the enabled image format, image contents and upload limit. Staff can preview it during review; approval copies it to the official team used by Teams and fixture displays. The file is held in memory until submission and must be selected again after a page reload.

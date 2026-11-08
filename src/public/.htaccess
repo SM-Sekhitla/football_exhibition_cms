@@ -1,0 +1,11 @@
+# React routes on Apache/LiteSpeed shared hosting.
+DirectoryIndex index.html
+<IfModule mod_rewrite.c>
+RewriteEngine On
+# Use one frontend hostname. Enable HTTPS in cPanel after SSL is issued.
+RewriteCond %{HTTP_HOST} ^www\.best5football\.co\.za$ [NC]
+RewriteRule ^ https://best5football.co.za%{REQUEST_URI} [R=301,L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [L]
+</IfModule>

@@ -50,3 +50,24 @@ Use Root Directory `.` (the repository root) and framework preset Vite. The root
 Set `VITE_API_URL=/api/v1` in Vercel. Keep backend secrets in Render. Vercel does not use the Docker Nginx configuration or `BACKEND_URL`; update the external rewrite in `vercel.json` if the backend domain changes.
 
 In Render, set `FRONTEND_URL` and `CORS_ORIGINS` to the final Vercel/custom frontend HTTPS origin, and `SECURE_COOKIES=true`. This also makes invitation/reset emails point to the deployed frontend. Redeploy both services after changing their environment settings. Requests to the frontend `/api/v1/health` should return backend JSON, and `/admin/login` should open the React login page.
+
+## Sivehost cPanel
+
+Build with `npm --prefix src run build:sivehost`. Upload the contents of `src/dist` to the domain document root, including `.htaccess`. Follow [the complete Sivehost and Render migration guide](src/docs/sivehost-deployment.md) for DNS, HTTPS, API cookies, and environment configuration.
+
+## Preview on Vercel, release to Sivehost
+
+Push frontend changes to GitHub to build the Vercel preview. Keep Vercel Root Directory `.` and `VITE_API_URL=/api/v1`; the root `vercel.json` proxies API requests to Render. The Sivehost profile is used only for explicit production builds.
+
+After reviewing a version on Vercel, check out the same commit locally and run:
+
+```bash
+npm --prefix src ci
+npm --prefix src run release:sivehost
+```
+
+Python 3 is needed only on the local packaging computer. A timestamped ZIP is created in `releases/`, with its Git revision and a `release.json` manifest. Upload and extract it in the Sivehost document root. Keep the previous ZIP to roll back. The script marks uncommitted work as `modified`; commit changes first to promote exactly the version tested on Vercel. Git pushes do not change Sivehost files automatically.
+
+To use both frontends with the existing Render backend, deploy the cookie-handling update and set `CORS_ORIGINS=https://best5football.co.za,https://football-exhibition-cms.vercel.app`. Keep `FRONTEND_URL=https://best5football.co.za` and `CSRF_COOKIE_DOMAIN=best5football.co.za`. Add any additional preview origin explicitly if required. The production domain uses a shared CSRF cookie; the Vercel same-origin proxy receives a host-only cookie instead.
+
+Both frontends currently use the same backend/database: admin edits and registrations made on Vercel affect live data. Use a separate development Render service/database and update Vercel's API rewrite if you need isolated testing.

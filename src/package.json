@@ -8,7 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "build:sivehost": "tsc --noEmit -p tsconfig.app.json && vite build --mode sivehost",
+    "release:sivehost": "python3 scripts/release_sivehost.py"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",

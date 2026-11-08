@@ -15,6 +15,8 @@ test('registration requires prerequisites and POP, reaches another admin browser
   await page.getByRole('checkbox').check();
   await page.getByRole('button',{name:'Start team registration'}).click();
   await expect(page.getByLabel('Team name',{exact:true})).toHaveValue(name);
+  await page.getByLabel('Team logo (optional)').setInputFiles('public/assets/images/logo/smt_logo.png');
+  await expect(page.getByAltText('Selected team logo preview')).toBeVisible();
   await page.getByRole('button',{name:'Continue',exact:true}).click();
   for(let i=1;i<=5;i++) await page.getByLabel(`Player ${i}`,{exact:true}).fill('Duplicate');
   await page.getByRole('button',{name:'Continue',exact:true}).click();
@@ -31,6 +33,7 @@ test('registration requires prerequisites and POP, reaches another admin browser
   await signIn(staff,'/admin/team-registrations');
   await staff.locator('article').filter({hasText:name}).getByRole('button',{name:'Review application'}).click();
   await expect(staff.getByRole('link',{name:'Download POP: proof.pdf'})).toHaveAttribute('href',/\/api\/v1\/files\//);
+  await expect(staff.getByAltText(`${name} team logo`)).toHaveAttribute('src',/\/api\/v1\/files\//);
   await staff.getByLabel('Approval status').selectOption('Approved');
   await staff.getByLabel('Payment status').selectOption('Verified');
   await staff.getByLabel('Note to applicant').fill('Your place is confirmed.');
@@ -38,6 +41,8 @@ test('registration requires prerequisites and POP, reaches another admin browser
   await staff.getByRole('button',{name:'Confirm',exact:true}).click();
   await expect(staff.getByRole('dialog')).toHaveCount(0);
   await page.goto('/teams');await expect(page.locator('main')).toContainText(name);
+  await expect(page.getByAltText(`${name} crest`)).toBeVisible();
+  await expect(page.getByAltText(`${name} crest`)).toHaveAttribute('src',/\/api\/v1\/files\//);
   await page.goto('/application-status');
   await page.getByLabel('Application reference').fill(reference);await page.getByLabel('Email address').fill('captain@example.com');
   await page.getByRole('button',{name:'Check status',exact:true}).click();

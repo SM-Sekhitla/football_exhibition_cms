@@ -132,3 +132,40 @@ nav button:hover { color: #c8ff4b; }
 @media (prefers-reduced-motion: reduce) {
   .hero-images__current { animation: none; }
 }
+
+.sponsor-section { width: 100%; max-width: none; padding: 40px 0; border-top: 1px solid #ffffff10; }
+.sponsor-marquee {
+  --sponsor-edge-fade: clamp(28px, 8vw, 140px);
+  width: calc(100% - 40px);
+  max-width: 1280px;
+  margin-inline: auto;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--sponsor-edge-fade), #000 calc(100% - var(--sponsor-edge-fade)), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 var(--sponsor-edge-fade), #000 calc(100% - var(--sponsor-edge-fade)), transparent 100%);
+}
+.sponsor-track { display: flex; width: max-content; animation: sponsor-scroll var(--sponsor-duration, 36s) linear infinite; }
+.sponsor-group { display: flex; flex-shrink: 0; gap: 18px; padding-right: 18px; }
+.sponsor-card { display: flex; align-items: center; justify-content: center; flex: 0 0 220px; width: 220px; max-width: 100%; height: 120px; padding: 14px; overflow: hidden; background: #fff; border-radius: 14px; }
+.sponsor-card img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.sponsor-marquee:hover .sponsor-track, .sponsor-marquee--paused .sponsor-track { animation-play-state: paused; }
+@keyframes sponsor-scroll { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .sponsor-marquee { -webkit-mask-image: none; mask-image: none; }
+  .sponsor-track { animation: none; width: 100%; }
+  .sponsor-group { flex-wrap: wrap; justify-content: center; width: 100%; padding: 0 20px; }
+  .sponsor-group + .sponsor-group { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) { .sponsor-card--repeat { display: none; } }
+
+.sponsor-section > div:first-child { margin-bottom: 24px; }
+.sponsor-section .btn-secondary { min-height: 36px; padding: .5rem .85rem; font-size: 10px; }
+@media (max-width: 639px) {
+  .sponsor-section { padding: 28px 0; }
+  .sponsor-section > div:first-child { margin-bottom: 18px; }
+  .sponsor-section h2 { font-size: 10px; letter-spacing: .16em; }
+  .sponsor-card { flex-basis: 160px; width: 160px; height: 94px; padding: 10px; border-radius: 10px; }
+  .sponsor-group { gap: 12px; padding-right: 12px; }
+}
+
+@media (min-width: 1024px) { .sponsor-marquee { width: 100%; } }

@@ -71,3 +71,7 @@ Python 3 is needed only on the local packaging computer. A timestamped ZIP is cr
 To use both frontends with the existing Render backend, deploy the cookie-handling update and set `CORS_ORIGINS=https://best5football.co.za,https://football-exhibition-cms.vercel.app`. Keep `FRONTEND_URL=https://best5football.co.za` and `CSRF_COOKIE_DOMAIN=best5football.co.za`. Add any additional preview origin explicitly if required. The production domain uses a shared CSRF cookie; the Vercel same-origin proxy receives a host-only cookie instead.
 
 Both frontends currently use the same backend/database: admin edits and registrations made on Vercel affect live data. Use a separate development Render service/database and update Vercel's API rewrite if you need isolated testing.
+
+## Installable app (PWA)
+
+The production site supports home-screen installation over HTTPS. Use Install BEST5 app in the public footer when offered by your browser, or the browser's install menu. On iPhone/iPad, use Safari → Share → Add to Home Screen. Offline visits show a branded reconnect screen; registrations, administration, and live content require internet access. The worker never caches API responses or admin pages. PWA support is included in regular builds; no app-store publication is required. Upload all build files together when publishing to Sivehost.

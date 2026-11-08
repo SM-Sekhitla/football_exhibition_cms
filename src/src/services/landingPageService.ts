@@ -1,7 +1,9 @@
 import { readCache, saveResource } from '@/lib/api';
 import { toast } from '@/components/shared/Toast';
 
+export interface SponsorLogo { id: string; name: string; image: string; scale: number; }
 export interface LandingPageContent {
+  sponsorLogos: SponsorLogo[];
   heroEyebrow: string;
   heroLineOne: string;
   heroHighlight: string;
@@ -22,6 +24,11 @@ export interface LandingPageContent {
 
 const KEY = 'landing';
 export const defaultLandingPage: LandingPageContent = {
+  sponsorLogos: [
+    {id:'silverdrop',name:'Silverdrop Water',image:'/assets/images/sponsors/silverdrop.png',scale:1.25},
+    {id:'aquelle',name:'aQuellé',image:'/assets/images/sponsors/aquelle.png',scale:1.15},
+    {id:'mall-of-the-north',name:'Mall of the North',image:'/assets/images/sponsors/mall-of-the-north.jpeg',scale:1.6},
+  ],
   heroEyebrow: 'SM Organisation presents',
   heroLineOne: 'Best5',
   heroHighlight: 'Football',
@@ -36,7 +43,7 @@ export const defaultLandingPage: LandingPageContent = {
 };
 
 export const landingPageService = {
-  get: () => readCache<LandingPageContent>(KEY, defaultLandingPage),
+  get: () => ({ ...defaultLandingPage, ...readCache<Partial<LandingPageContent>>(KEY, {}) }),
   async save(value: LandingPageContent) { await saveResource(KEY,value); toast.success('Landing page updated'); return value; },
   async reset() { await saveResource(KEY,defaultLandingPage); toast.info('Landing page reset'); return defaultLandingPage; },
 };

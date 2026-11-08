@@ -1,0 +1,21 @@
+{
+  "id": "/",
+  "name": "BEST5 Football Exhibition",
+  "short_name": "BEST5",
+  "description": "Fixtures, teams, tournament updates and registration for the BEST5 Football Exhibition.",
+  "lang": "en-ZA",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#07100c",
+  "theme_color": "#07100c",
+  "icons": [
+    {"src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ],
+  "shortcuts": [
+    {"name": "Register your team", "url": "/register"},
+    {"name": "Check application status", "url": "/application-status"}
+  ]
+}

@@ -8,10 +8,10 @@ export interface Team { id: string; name: string; short: string; captain: string
 export interface Fixture { id: string; stage: string; group: string; homeId: string; awayId: string; date: string; time: string; pitch: string; status: FixtureStatus; homeScore?: number; awayScore?: number; }
 export interface Post { id: string; title: string; slug: string; category: string; excerpt: string; content: string; image: string; date: string; featured: boolean; status: 'Draft' | 'Published'; updatedAt?: string; }
 export interface TeamRegistration { id: string; teamName: string; captain: string; email: string; city: string; players: string[]; status: ApplicationStatus; submitted: string; proofOfPayment?: { name: string; data: string; type: string }; logo?: string; officialTeamId?: string; reviewNote?: string; paymentStatus?: 'Awaiting payment' | 'Under review' | 'Verified'; }
-export interface VendorRegistration { id: string; business: string; contact: string; category: string; email: string; description?: string; status: ApplicationStatus; submitted: string; reviewNote?: string; paymentStatus?: 'Awaiting payment' | 'Under review' | 'Verified'; }
+export interface VendorRegistration { stallFee?: number; id: string; business: string; contact: string; category: string; email: string; description?: string; status: ApplicationStatus; submitted: string; reviewNote?: string; paymentStatus?: 'Awaiting payment' | 'Under review' | 'Verified'; }
 export type ModuleKey = 'news' | 'tournament' | 'fixtures' | 'results' | 'standings' | 'knockout' | 'teams' | 'teamRegistration' | 'vendorRegistration' | 'vendors' | 'gallery' | 'sponsors' | 'countdown' | 'liveScores' | 'homepageNews' | 'homepageTeams' | 'homepageSponsors';
 export interface BankingDetails { bankName: string; accountNumber: string; accountName: string; accountType: string; branchCode: string; reference: string; }
-export interface Settings { banking: BankingDetails; registrationPrerequisites: string; lifecycle: Lifecycle; tournamentName: string; eventDate: string; venue: string; city: string; prize: number; numberOfTeams: number; affiliationFee: number; spotBookingFee: number; vendorStallFee: number; contactEmail: string; contactPhone: string; whatsapp: string; instagram: string; facebook: string; twitter: string; youtube: string; tiktok: string; branding: { mainLogo: string; lightLogo: string; favicon: string }; modules: Record<ModuleKey, boolean>; }
+export interface Settings { banking: BankingDetails; registrationPrerequisites: string; lifecycle: Lifecycle; tournamentName: string; eventDate: string; venue: string; city: string; prize: number; numberOfTeams: number; affiliationFee: number; spotBookingFee: number; vendorStallFee: number; vendorFoodStallFee: number; contactEmail: string; contactPhone: string; whatsapp: string; instagram: string; facebook: string; twitter: string; youtube: string; tiktok: string; branding: { mainLogo: string; lightLogo: string; favicon: string }; modules: Record<ModuleKey, boolean>; }
 
 const teams: Team[] = [];
 const fixtures: Fixture[] = [];
@@ -45,7 +45,7 @@ All team captains must join the captain’s group chat to keep up with important
 https://chat.whatsapp.com/DMNraaTNX3C5sfgd1fq9t?cs=cl&pi=i&lir=0&amv=0
 
 QUESTIONS?
-Contact Thato Modiba at 071 413 6394 or BEST5EXHIBITION@GMAIL.COM.`, lifecycle: 'Pre Tournament', tournamentName: 'BEST5 Football Exhibition', eventDate: '2026-12-12T09:00:00', venue: 'Northern Muslim School', city: 'Polokwane', prize: 10000, numberOfTeams: 16, affiliationFee: 1500, spotBookingFee: 250, vendorStallFee: 350, contactEmail: 'admin@best5.co.za', contactPhone: '+27 72 000 5505', whatsapp: '+27 72 000 5505', instagram: 'https://instagram.com/bestfivefootball_exhibition', facebook: '', twitter: '', youtube: '', tiktok: '', branding: { mainLogo: '/assets/images/logo/smt_logo.png', lightLogo: '/assets/images/logo/smt_logo.png', favicon: '/assets/images/logo/smt_logo.png' }, modules: { news: true, tournament: true, fixtures: true, results: true, standings: true, knockout: true, teams: true, teamRegistration: true, vendorRegistration: true, vendors: true, gallery: true, sponsors: true, countdown: true, liveScores: true, homepageNews: true, homepageTeams: true, homepageSponsors: true } };
+Contact Thato Modiba at 071 413 6394 or BEST5EXHIBITION@GMAIL.COM.`, lifecycle: 'Pre Tournament', tournamentName: 'BEST5 Football Exhibition', eventDate: '2026-12-12T09:00:00', venue: 'Northern Muslim School', city: 'Polokwane', prize: 10000, numberOfTeams: 16, affiliationFee: 1500, spotBookingFee: 250, vendorStallFee: 350, vendorFoodStallFee: 1000, contactEmail: 'admin@best5.co.za', contactPhone: '+27 72 000 5505', whatsapp: '+27 72 000 5505', instagram: 'https://instagram.com/bestfivefootball_exhibition', facebook: '', twitter: '', youtube: '', tiktok: '', branding: { mainLogo: '/assets/images/logo/smt_logo.png', lightLogo: '/assets/images/logo/smt_logo.png', favicon: '/assets/images/logo/smt_logo.png' }, modules: { news: true, tournament: true, fixtures: true, results: true, standings: true, knockout: true, teams: true, teamRegistration: true, vendorRegistration: true, vendors: true, gallery: true, sponsors: true, countdown: true, liveScores: true, homepageNews: true, homepageTeams: true, homepageSponsors: true } };
 
 export const repository = {
   getTeams: () => readCache<Team[]>('teams', teams),
@@ -53,7 +53,7 @@ export const repository = {
   getPosts: () => readCache<Post[]>('posts', posts),
   getTeamRegistrations: () => readCache<TeamRegistration[]>('teamRegs', []),
   getVendorRegistrations: () => readCache<VendorRegistration[]>('vendorRegs', []),
-  getSettings: () => readCache<Settings>('settings', defaultSettings),
+  getSettings: () => ({...defaultSettings,...readCache<Partial<Settings>>('settings', {})}),
   saveTeams: (value: Team[]) => saveResource('teams', value),
   saveFixtures: (value: Fixture[]) => saveResource('fixtures', value),
   savePosts: (value: Post[]) => saveResource('posts', value),

@@ -30,6 +30,16 @@ export const postService = {
     post = { ...post, content:articleHtml(post.content) };
     const all = repository.getPosts(); const value = { ...post, updatedAt: new Date().toISOString() }; await repository.savePosts(all.some(p => p.id === post.id) ? all.map(p => p.id === post.id ? value : p) : [value, ...all]); toast.success(post.status === 'Published' ? 'Post published' : 'Draft saved', post.title); return value; },
   async delete(id: string) { const post = this.getById(id); await repository.savePosts(repository.getPosts().filter(item => item.id !== id)); if (post) { toast.success('Post deleted',post.title); } },
+  async move(id: string, direction: -1 | 1) {
+    const posts=[...repository.getPosts()];
+    const index=posts.findIndex(post=>post.id===id);
+    if(index<0) throw new Error('This post is no longer available. Refresh and try again.');
+    const target=index+direction;
+    if(target<0 || target>=posts.length) return;
+    [posts[index],posts[target]]=[posts[target],posts[index]];
+    await repository.savePosts(posts);
+    toast.success('Post order updated');
+  },
   async setStatus(id: string, status: Post['status']) { const post = this.getById(id); if (post) await this.save({ ...post, status }); },
 };
 

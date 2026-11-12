@@ -35,7 +35,7 @@ export default function TeamLogoUpload({ value, onChange, onBusyChange }: {
     finally { setBusy(false); onBusyChange(false); }
   };
   return <section className="space-y-3 rounded-xl border border-white/10 p-4">
-    <FormField label="Team logo (optional)"><input ref={input} className="field" type="file" accept={policy.types.join(',')} disabled={busy} onChange={e => void read(e.target.files?.[0])}/></FormField>
+    <FormField label="Team logo (required)"><input ref={input} required={!value} className="field" type="file" accept={policy.types.join(',')} disabled={busy} onChange={e => void read(e.target.files?.[0])}/></FormField>
     <p className="text-xs leading-6 text-white/60">Your logo will appear in Teams and match fixtures after approval. Use a square image with a clear background. Accepted: {policy.types.map(type => type.split('/')[1].toUpperCase()).join(', ')}. Maximum {limit} MB. Reselect the file if you reload this draft.</p>
     {busy && <p role="status" className="text-sm text-white/70">Reading logo…</p>}
     {error && <p role="alert" className="form-error">{error}</p>}

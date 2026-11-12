@@ -9,13 +9,17 @@ test('registration requires prerequisites and POP, reaches another admin browser
   await page.getByRole('button',{name:'Start team registration'}).click();
   await page.getByLabel('Team name',{exact:true}).fill(name);
   await page.getByLabel('Captain name').fill('Player 1');
+  await page.getByLabel('Phone number').fill('+27 71 234 5678');
   await page.getByLabel('Email address',{exact:true}).fill('captain@example.com');
   await page.getByLabel('City',{exact:true}).fill('Polokwane');
   await page.reload();
   await page.getByRole('checkbox').check();
   await page.getByRole('button',{name:'Start team registration'}).click();
   await expect(page.getByLabel('Team name',{exact:true})).toHaveValue(name);
-  await page.getByLabel('Team logo (optional)').setInputFiles('public/assets/images/logo/smt_logo.png');
+  await expect(page.getByLabel('Phone number')).toHaveValue('+27 71 234 5678');
+  await page.getByRole('button',{name:'Continue',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Team details',exact:true})).toBeVisible();
+  await page.getByLabel('Team logo (required)').setInputFiles('public/assets/images/logo/smt_logo.png');
   await expect(page.getByAltText('Selected team logo preview')).toBeVisible();
   await page.getByRole('button',{name:'Continue',exact:true}).click();
   for(let i=1;i<=5;i++) await page.getByLabel(`Player ${i}`,{exact:true}).fill('Duplicate');
@@ -32,6 +36,7 @@ test('registration requires prerequisites and POP, reaches another admin browser
   const staffContext=await browser.newContext();const staff=await staffContext.newPage();
   await signIn(staff,'/admin/team-registrations');
   await staff.locator('article').filter({hasText:name}).getByRole('button',{name:'Review application'}).click();
+  await expect(staff.getByRole('link',{name:'+27 71 234 5678',exact:true})).toBeVisible();
   await expect(staff.getByRole('link',{name:'Download POP: proof.pdf'})).toHaveAttribute('href',/\/api\/v1\/files\//);
   await expect(staff.getByAltText(`${name} team logo`)).toHaveAttribute('src',/\/api\/v1\/files\//);
   await staff.getByLabel('Approval status').selectOption('Approved');
